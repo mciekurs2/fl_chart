@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:fl_chart/src/chart/bar_chart/bar_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/chart/line_chart/line_chart_painter.dart';
-import 'package:fl_chart/src/extensions/canvas_extension.dart';
+import 'package:fl_chart/src/extensions/canvas_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'axis_chart_data.dart';
@@ -213,7 +213,7 @@ abstract class AxisChartPainter<D extends AxisChartData> extends BaseChartPainte
           final double y1 = 0 + getTopOffsetDrawSize();
           final double x2 = bothX;
           final double y2 = usableViewSize.height + getTopOffsetDrawSize();
-          canvas.drawDashedLine(Offset(x1, y1), Offset(x2, y2), _gridPaint, flLineStyle.dashArray);
+          drawDashedLine(canvas, Offset(x1, y1), Offset(x2, y2), _gridPaint, flLineStyle.dashArray);
         }
         verticalSeek += data.gridData.verticalInterval;
       }
@@ -233,7 +233,7 @@ abstract class AxisChartPainter<D extends AxisChartData> extends BaseChartPainte
           final double y1 = bothY;
           final double x2 = usableViewSize.width + getLeftOffsetDrawSize();
           final double y2 = bothY;
-          canvas.drawDashedLine(Offset(x1, y1), Offset(x2, y2), _gridPaint, flLine.dashArray);
+          drawDashedLine(canvas, Offset(x1, y1), Offset(x2, y2), _gridPaint, flLine.dashArray);
         }
 
         horizontalSeek += data.gridData.horizontalInterval;
@@ -274,7 +274,7 @@ abstract class AxisChartPainter<D extends AxisChartData> extends BaseChartPainte
 
         final double bottomChartPadding = getExtraNeededVerticalSpace() - getTopOffsetDrawSize();
         final Offset to = Offset(
-          getPixelX(annotation.x2, chartUsableSize), viewSize.height - bottomChartPadding); //9
+            getPixelX(annotation.x2, chartUsableSize), viewSize.height - bottomChartPadding); //9
 
         final Rect rect = Rect.fromPoints(from, to);
 
@@ -286,13 +286,13 @@ abstract class AxisChartPainter<D extends AxisChartData> extends BaseChartPainte
 
     if (data.rangeAnnotations.horizontalRangeAnnotations.isNotEmpty) {
       for (HorizontalRangeAnnotation annotation
-      in data.rangeAnnotations.horizontalRangeAnnotations) {
+          in data.rangeAnnotations.horizontalRangeAnnotations) {
         final double leftChartPadding = getLeftOffsetDrawSize();
         final Offset from = Offset(leftChartPadding, getPixelY(annotation.y1, chartUsableSize));
 
         final double rightChartPadding = getExtraNeededHorizontalSpace() - getLeftOffsetDrawSize();
         final Offset to =
-        Offset(viewSize.width - rightChartPadding, getPixelY(annotation.y2, chartUsableSize));
+            Offset(viewSize.width - rightChartPadding, getPixelY(annotation.y2, chartUsableSize));
 
         final Rect rect = Rect.fromPoints(from, to);
 

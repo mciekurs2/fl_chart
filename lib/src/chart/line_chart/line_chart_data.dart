@@ -12,7 +12,6 @@ import 'package:flutter/material.dart' hide Image;
 /// It holds data needed to draw a line chart,
 /// including bar lines, spots, colors, touches, ...
 class LineChartData extends AxisChartData {
-
   /// [LineChart] draws some lines in various shapes and overlaps them.
   final List<LineChartBarData> lineBarsData;
 
@@ -229,12 +228,14 @@ class LineChartData extends AxisChartData {
 
 /// Holds data for drawing each individual line in the [LineChart]
 class LineChartBarData {
-
   /// This line goes through this spots.
   ///
   /// You can have multiple lines by splitting them,
   /// put a [FlSpot.nullSpot] between each section.
   final List<FlSpot> spots;
+
+  /// Used if list of FlSpots detected
+  final List<FlSpot> rawSpots;
 
   /// Determines to show or hide the line.
   final bool show;
@@ -329,6 +330,7 @@ class LineChartBarData {
   /// [LineChart] draws the lines with dashed effect if you fill [dashArray].
   const LineChartBarData({
     this.spots = const [],
+    this.rawSpots,
     this.show = true,
     this.colors = const [Colors.redAccent],
     this.colorStops,
@@ -532,7 +534,6 @@ class BetweenBarsData {
 
 /// Holds data for drawing line on the spots under the [BarAreaData].
 class BarAreaSpotsLine {
-
   /// Determines to show or hide all the lines.
   final bool show;
 
@@ -574,7 +575,6 @@ bool showAllSpotsBelowLine(FlSpot spot) {
 
 /// Holds data for showing dots on the bar line.
 class FlDotData {
-
   /// Determines show or hide all dots.
   final bool show;
 
@@ -626,7 +626,6 @@ bool showAllDots(FlSpot spot) {
 /// [LineChart] draws some [HorizontalLine] (set by [LineChartData.extraLinesData]),
 /// in below or above of everything, it draws from left to right side of the chart.
 class HorizontalLine extends FlLine {
-
   /// Draws from left to right of the chart using the [y] value.
   final double y;
 
@@ -678,7 +677,6 @@ class HorizontalLine extends FlLine {
 /// [LineChart] draws some [VerticalLine] (set by [LineChartData.extraLinesData]),
 /// in below or above of everything, it draws from bottom to top side of the chart.
 class VerticalLine extends FlLine {
-
   /// Draws from bottom to top of the chart using the [x] value.
   final double x;
 
@@ -727,7 +725,6 @@ class VerticalLine extends FlLine {
 
 /// Shows a text label
 abstract class FlLineLabel {
-
   /// Determines showing label or not.
   final bool show;
 
@@ -745,12 +742,10 @@ abstract class FlLineLabel {
   /// size, ... of the text.
   /// [show] determines showing label or not.
   const FlLineLabel({this.show, this.padding, this.style, this.alignment});
-
 }
 
 /// Draws a title on the [HorizontalLine]
 class HorizontalLineLabel extends FlLineLabel {
-
   /// Resolves a label for showing.
   final String Function(HorizontalLine) labelResolver;
 
@@ -789,7 +784,6 @@ class HorizontalLineLabel extends FlLineLabel {
 
 /// Draws a title on the [VerticalLine]
 class VerticalLineLabel extends FlLineLabel {
-
   /// Resolves a label for showing.
   final String Function(VerticalLine) labelResolver;
 
@@ -824,7 +818,6 @@ class VerticalLineLabel extends FlLineLabel {
       show: b.show,
     );
   }
-
 }
 
 /// Holds data for showing a vector image inside the chart.
@@ -839,7 +832,6 @@ class VerticalLineLabel extends FlLineLabel {
 ///  }
 /// ```
 class SizedPicture {
-
   /// Is the showing image.
   Picture picture;
 
@@ -863,7 +855,6 @@ class SizedPicture {
 
 /// Draws some straight horizontal or vertical lines in the [LineChart]
 class ExtraLinesData {
-
   final List<HorizontalLine> horizontalLines;
   final List<VerticalLine> verticalLines;
 
@@ -897,7 +888,6 @@ class ExtraLinesData {
 /// in a simple way, each chart captures the touch events, and passes a concrete
 /// instance of [FlTouchInput] to the painter, and gets a generated [LineTouchResponse].
 class LineTouchData extends FlTouchData {
-
   /// Configs of how touch tooltip popup.
   final LineTouchTooltipData touchTooltipData;
 
@@ -970,11 +960,11 @@ class LineTouchData extends FlTouchData {
 /// length of this list should be equal to the [spotIndexes.length],
 /// each [TouchedSpotIndicatorData] determines the look of showing indicator.
 typedef GetTouchedSpotIndicator = List<TouchedSpotIndicatorData> Function(
-  LineChartBarData barData, List<int> spotIndexes);
+    LineChartBarData barData, List<int> spotIndexes);
 
 /// Default presentation of touched indicators.
 List<TouchedSpotIndicatorData> defaultTouchedIndicators(
-  LineChartBarData barData, List<int> indicators) {
+    LineChartBarData barData, List<int> indicators) {
   if (indicators == null) {
     return [];
   }
@@ -1005,7 +995,6 @@ List<TouchedSpotIndicatorData> defaultTouchedIndicators(
 
 /// Holds representation data for showing tooltip popup on top of spots.
 class LineTouchTooltipData {
-
   /// The tooltip background color.
   final Color tooltipBgColor;
 
@@ -1085,7 +1074,6 @@ List<LineTooltipItem> defaultLineTooltipItem(List<LineBarSpot> touchedSpots) {
 
 /// Represent a targeted spot inside a line bar.
 class LineBarSpot extends FlSpot {
-
   /// Is the [LineChartBarData] that this spot is inside of.
   final LineChartBarData bar;
 
@@ -1103,13 +1091,12 @@ class LineBarSpot extends FlSpot {
     this.bar,
     this.barIndex,
     FlSpot spot,
-    )   : spotIndex = bar.spots.indexOf(spot),
-      super(spot.x, spot.y);
+  )   : spotIndex = bar.spots.indexOf(spot),
+        super(spot.x, spot.y);
 }
 
 /// Holds data of showing each row item in the tooltip popup.
 class LineTooltipItem {
-
   /// Showing text.
   final String text;
 
@@ -1124,7 +1111,6 @@ class LineTooltipItem {
 /// [indicatorBelowLine] we draw a vertical line below of the touched spot
 /// [touchedSpotDotData] we draw a larger dot on the touched spot to bold it
 class TouchedSpotIndicatorData {
-
   /// Determines line's style.
   final FlLine indicatorBelowLine;
 
@@ -1144,7 +1130,6 @@ class TouchedSpotIndicatorData {
 /// You can override [LineTouchData.touchCallback] to handle touch events,
 /// it gives you a [LineTouchResponse] and you can do whatever you want.
 class LineTouchResponse extends BaseTouchResponse {
-
   /// touch happened on these spots
   /// (if a single line provided on the chart, [lineBarSpots]'s length will be 1 always)
   final List<LineBarSpot> lineBarSpots;
@@ -1157,8 +1142,6 @@ class LineTouchResponse extends BaseTouchResponse {
     FlTouchInput touchInput,
   ) : super(touchInput);
 }
-
-
 
 /// It lerps a [LineChartData] to another [LineChartData] (handles animation for updating values)
 class LineChartDataTween extends Tween<LineChartData> {

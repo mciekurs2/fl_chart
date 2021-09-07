@@ -6,8 +6,7 @@ import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_data.dart';
 import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/chart/base/base_chart/touch_input.dart';
-import 'package:fl_chart/src/extensions/canvas_extension.dart';
-import 'package:fl_chart/src/extensions/path_extension.dart';
+import 'package:fl_chart/src/extensions/canvas_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -17,7 +16,6 @@ import 'line_chart_data.dart';
 /// Paints [LineChartData] in the canvas, it can be used in a [CustomPainter]
 class LineChartPainter extends AxisChartPainter<LineChartData>
     with TouchHandler<LineTouchResponse> {
-
   Paint _barPaint,
       _barAreaPaint,
       _barAreaLinesPaint,
@@ -140,7 +138,10 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
     }
   }
 
-  void _clipToBorder(ui.Canvas canvas, ui.Size size,) {
+  void _clipToBorder(
+    ui.Canvas canvas,
+    ui.Size size,
+  ) {
     final usableSize = getChartUsableDrawSize(size);
 
     double left = 0;
@@ -248,14 +249,20 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
     final List<TouchedSpotIndicatorData> indicatorsData =
         data.lineTouchData.getTouchedSpotIndicator(barData, barData.showingIndicators);
 
-    if (indicatorsData.length != barData.showingIndicators.length) {
-      throw Exception('indicatorsData and touchedSpotOffsets size should be same');
-    }
+    // Ignore this line
+    // if (indicatorsData.length != barData.showingIndicators.length) {
+    //   throw Exception('indicatorsData and touchedSpotOffsets size should be same');
+    // }
 
     for (int i = 0; i < barData.showingIndicators.length; i++) {
       final TouchedSpotIndicatorData indicatorData = indicatorsData[i];
       final int index = barData.showingIndicators[i];
-      FlSpot spot = barData.spots[index];
+      FlSpot spot;
+      if (barData.rawSpots != null) {
+        spot = barData.rawSpots[index];
+      } else {
+        spot = barData.spots[index];
+      }
 
       if (indicatorData == null) {
         continue;
@@ -275,8 +282,8 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
       _touchLinePaint.color = indicatorData.indicatorBelowLine.color;
       _touchLinePaint.strokeWidth = indicatorData.indicatorBelowLine.strokeWidth;
 
-      canvas.drawDashedLine(
-          from, lineEnd, _touchLinePaint, indicatorData.indicatorBelowLine.dashArray);
+      drawDashedLine(
+          canvas, from, lineEnd, _touchLinePaint, indicatorData.indicatorBelowLine.dashArray);
 
       /// Draw the indicator dot
       if (indicatorData.touchedSpotDotData != null && indicatorData.touchedSpotDotData.show) {
@@ -517,8 +524,8 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
           _barAreaLinesPaint.color = barData.belowBarData.spotsLine.flLineStyle.color;
           _barAreaLinesPaint.strokeWidth = barData.belowBarData.spotsLine.flLineStyle.strokeWidth;
 
-          canvas.drawDashedLine(
-              from, to, _barAreaLinesPaint, barData.belowBarData.spotsLine.flLineStyle.dashArray);
+          drawDashedLine(canvas, from, to, _barAreaLinesPaint,
+              barData.belowBarData.spotsLine.flLineStyle.dashArray);
         }
       }
     }
@@ -592,8 +599,8 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
           _barAreaLinesPaint.color = barData.aboveBarData.spotsLine.flLineStyle.color;
           _barAreaLinesPaint.strokeWidth = barData.aboveBarData.spotsLine.flLineStyle.strokeWidth;
 
-          canvas.drawDashedLine(
-              from, to, _barAreaLinesPaint, barData.aboveBarData.spotsLine.flLineStyle.dashArray);
+          drawDashedLine(canvas, from, to, _barAreaLinesPaint,
+              barData.aboveBarData.spotsLine.flLineStyle.dashArray);
         }
       }
     }
@@ -690,7 +697,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
     }
 
     _barPaint.strokeWidth = barData.barWidth;
-    barPath = barPath.toDashedPath(barData.dashArray);
+    barPath = toDashedPath(barPath, barData.dashArray);
     canvas.drawPath(barPath, _barPaint);
   }
 
@@ -845,7 +852,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
         _extraLinesPaint.color = line.color;
         _extraLinesPaint.strokeWidth = line.strokeWidth;
 
-        canvas.drawDashedLine(from, to, _extraLinesPaint, line.dashArray);
+        drawDashedLine(canvas, from, to, _extraLinesPaint, line.dashArray);
 
         if (line.sizedPicture != null) {
           final double centerX = line.sizedPicture.width / 2;
@@ -909,7 +916,7 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
         _extraLinesPaint.color = line.color;
         _extraLinesPaint.strokeWidth = line.strokeWidth;
 
-        canvas.drawDashedLine(from, to, _extraLinesPaint, line.dashArray);
+        drawDashedLine(canvas, from, to, _extraLinesPaint, line.dashArray);
 
         if (line.sizedPicture != null) {
           final double centerX = line.sizedPicture.width / 2;
@@ -1223,5 +1230,4 @@ class LineChartPainter extends AxisChartPainter<LineChartData>
   /// [LineChartPainter] should repaint itself.
   @override
   bool shouldRepaint(LineChartPainter oldDelegate) => oldDelegate.data != data;
-
 }
