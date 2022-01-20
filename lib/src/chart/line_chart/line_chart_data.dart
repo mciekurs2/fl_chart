@@ -271,6 +271,9 @@ class LineChartBarData with EquatableMixin {
   /// Holds data for representing a Step Line Chart, and works only if [isStepChart] is true.
   final LineChartStepData lineChartStepData;
 
+  /// Experimental variable to support multiple line functionality
+  final List<FlSpot>? rawSpotValues;
+
   /// [BarChart] draws some lines and overlaps them in the chart's view,
   /// You can have multiple lines by splitting them,
   /// put a [FlSpot.nullSpot] between each section.
@@ -331,6 +334,7 @@ class LineChartBarData with EquatableMixin {
     Shadow? shadow,
     bool? isStepLineChart,
     LineChartStepData? lineChartStepData,
+    List<FlSpot>? rawSpotValues,
   })  : spots = spots ?? const [],
         show = show ?? true,
         colors = colors ?? const [Colors.cyan],
@@ -351,7 +355,8 @@ class LineChartBarData with EquatableMixin {
         dashArray = dashArray,
         shadow = shadow ?? const Shadow(color: Colors.transparent),
         isStepLineChart = isStepLineChart ?? false,
-        lineChartStepData = lineChartStepData ?? LineChartStepData();
+        lineChartStepData = lineChartStepData ?? LineChartStepData(),
+        rawSpotValues = rawSpotValues;
 
   /// Lerps a [LineChartBarData] based on [t] value, check [Tween.lerp].
   static LineChartBarData lerp(

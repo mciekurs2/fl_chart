@@ -299,15 +299,23 @@ class LineChartPainter extends AxisChartPainter<LineChartData> {
     final indicatorsData = data.lineTouchData
         .getTouchedSpotIndicator(barData, barData.showingIndicators);
 
-    if (indicatorsData.length != barData.showingIndicators.length) {
-      throw Exception(
-          'indicatorsData and touchedSpotOffsets size should be same');
+    if (barData.rawSpotValues != null) {
+      if (indicatorsData.length != barData.showingIndicators.length) {
+        throw Exception(
+            'indicatorsData and touchedSpotOffsets size should be same');
+      }
     }
 
     for (var i = 0; i < barData.showingIndicators.length; i++) {
       final indicatorData = indicatorsData[i];
       final index = barData.showingIndicators[i];
-      final spot = barData.spots[index];
+
+      FlSpot spot;
+      if (barData.rawSpotValues != null) {
+        spot = barData.rawSpotValues![index];
+      } else {
+        spot = barData.spots[index];
+      }
 
       if (indicatorData == null) {
         continue;
